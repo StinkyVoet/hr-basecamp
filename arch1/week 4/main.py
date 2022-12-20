@@ -22,7 +22,7 @@ def main():
     # Setup
     player = tlib.Player.new()
     command: tlib.Command
-    output: tlib.string
+    output: str
     world = tlib.World.new()
 
     print()
