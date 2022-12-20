@@ -14,6 +14,7 @@ Create an application that manages contacts in an addressbook. The following req
 import os
 import sys
 import json
+from typing import Optional
 
 addressbook = []
 
@@ -39,7 +40,7 @@ def display(list = []):
     print(f"Phone numbers: {', '.join(map(str,list['phone_numbers']))}")
 
 
-def list_contacts(sort_by: str, direction = 'ASC'):
+def list_contacts(sort_by: Optional[str] = None, direction = 'ASC'):
     '''
     Return list of contacts sorted by first_name or last_name [if blank then unsorted], direction [ASC (default)/DESC])
     '''
@@ -48,14 +49,15 @@ def list_contacts(sort_by: str, direction = 'ASC'):
     if direction.upper() == 'DESC':
         reverse = True
 
-    sorted_list = sorted(addressbook, key=lambda d: d[sort_by], reverse=reverse)
+    if sort_by:
+        sorted_list = sorted(addressbook, key=lambda d: d[sort_by], reverse=reverse)
+    else:
+        sorted_list = addressbook
 
-    print(sorted_list)
-
-    return addressbook
+    return sorted_list
 
 
-def add_contact(first_name: str, last_name: str, emails: set[str] = set(), phone_numbers: set[str] = set()):
+def add_contact(first_name: str, last_name: str, emails: list[str] = [], phone_numbers: list[str] = []):
     '''
     Add new contact:
     - first_name
@@ -64,7 +66,15 @@ def add_contact(first_name: str, last_name: str, emails: set[str] = set(), phone
     - phone_numbers = {}
     '''
     # todo: implement this function
-    ...
+    addressbook.append({
+        'id': len(addressbook) + 1,
+        'first_name': first_name,
+        'last_name': last_name,
+        'emails': emails,
+        'phone_numbers': phone_numbers,
+    })
+
+    write_to_json('contacts.json')
 
 
 def remove_contact(id: int):
@@ -106,7 +116,15 @@ def write_to_json(filename):
     with open(os.path.join(sys.path[0], filename), "w") as outfile:
         outfile.write(json_object)
 
-
+def get_input_yn(prompt: str) -> bool:
+    while True:
+        match input(prompt).lower():
+            case 'y':
+                return True
+            case 'n':
+                return False
+            case _:
+                continue
 
 def main(json_file):
     '''
@@ -130,18 +148,31 @@ def main(json_file):
 
     # list_contacts('first_name', 'desc')
 
-    match input('[L] List contacts\n[A] Add contact\n[R] Remove contact\n[M] Merge contacts\n[Q] Quit program').upper():
-        case 'L':
-            sort_by = input('Sort by: ')
-            direction = input('Direction: ')
-            list_contacts(sort_by, direction)
-        case 'A':
-            first_name = input('First Name: ')
-            last_name = input('Last Name: ')
-            emails = []
-            
-            add_contact(first_name, last_name, emails, phone_numbers)
-    
+    while True:
+        match input('[L] List contacts\n[A] Add contact\n[R] Remove contact\n[M] Merge contacts\n[Q] Quit program\n').upper():
+            case 'L':
+                # sort_by = input('Sort by: ')
+                # direction = input('Direction: ')
+                for contact in list_contacts():
+                    display(contact)
+            case 'A':
+                first_name = input('First Name: ')
+                last_name = input('Last Name: ')
+                emails = []
+                while True:
+                    emails.append(input('Enter an email: '))
+                    if not get_input_yn('Another? (y/n): '):
+                        break
+                phone_numbers = []
+                while True:
+                    phone_numbers.append(input('Enter a phone number: '))
+                    if not get_input_yn('Another? (y/n): '):
+                        break
+
+                add_contact(first_name, last_name, emails, phone_numbers)
+            case 'Q':
+                quit()
+
 
 '''
 calling main function: 
