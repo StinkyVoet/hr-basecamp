@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script defer src="{{ url_for('static', filename='script.js') }}" type="module"></script>
+</head>
+
+<body>
+    <nav>
+        <span>Dashboard</span>
+    </nav>
+    <main>
+        <section class="section-statistics">
+            {% for key, statistic in statistics.items() %}
+            <div class="card-row">
+                <div class="card">
+                    <h4>Average {{ key }}</h4>
+                    <p class="statistic" data-statistic="{{ key }}" data-value="average">{{ statistic["average"] }}</p>
+                </div>
+                <div class="card">
+                    <h4>Minimum {{ key }}</h4>
+                    <p class="statistic" data-statistic="{{ key }}" data-value="min">{{ statistic["min"] }}</p>
+                </div>
+                <div class="card">
+                    <h4>Maximum {{ key }}</h4>
+                    <p class="statistic" data-statistic="{{ key }}" data-value="max">{{ statistic["max"] }}</p>
+                </div>
+                <div class="card">
+                    <h4>Standard deviation of {{ key }}</h4>
+                    <p class="statistic" data-statistic="{{ key }}" data-value="std_dev">{{ statistic["std_dev"] }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        <section>
+            <div class="chart-wrapper">
+                <canvas id="temperature_chart" data-labels="{{ labels }}" data-temperatures="{{ temperatures }}"
+                    data-humidity="{{ humidity }}" data-pressure="{{ pressure }}"></canvas>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>
